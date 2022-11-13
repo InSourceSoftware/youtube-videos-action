@@ -42508,7 +42508,6 @@ function fetchVideos(apiKey, playlistId, thumbnailSize, outputPath, outputFilena
   });
 }
 
-
 function template(str, item, thumbnailSize) {
   return str
     .replace('${id}', item.id)
@@ -42529,7 +42528,8 @@ function template(str, item, thumbnailSize) {
 function clean(str) {
   return str
     .replace('\n', '\\n')
-    .replace(/^\d{1,4}\.\d{1,4}\.\d{1,4}[ _.-]+/, '');
+    .replace('\'', '\\\'')
+    .replace(/^\d{1,4}([ _./-]\d{1,4})+[ _./-]+/, '');
 }
 })();
 
