@@ -57,12 +57,13 @@ function fetchVideos(apiKey, playlistId, thumbnailSize, outputPath, outputFilena
 }
 
 function template(str, item, thumbnailSize) {
+  const thumbnail = item.snippet.thumbnails[thumbnailSize] || item.snippet.thumbnails['default'];
   return str
     .replace('${id}', item.id)
     .replace('${etag}', item.etag)
     .replace('${title}', clean(item.snippet.title))
     .replace('${description}', clean(item.snippet.description))
-    .replace('${thumbnailUrl}', item.snippet.thumbnails[thumbnailSize].url)
+    .replace('${thumbnailUrl}', thumbnail.url)
     .replace('${channelId}', item.snippet.channelId)
     .replace('${channelTitle}', clean(item.snippet.channelTitle))
     .replace('${playlistId}', item.snippet.playlistId)
