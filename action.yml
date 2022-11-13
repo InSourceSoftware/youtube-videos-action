@@ -1,0 +1,41 @@
+name: 'YouTube Videos Action'
+description: 'Sync YouTube videos into a website as files or posts.'
+inputs:
+  api-key:
+    description: 'Google data api key with access to YouTube Data API v3'
+    required: true
+  playlist-id:
+    description: 'YouTube playlist id'
+    required: true
+  thumbnail-size:
+    description: 'Thumbnail image size name, one of default, medium, high, standard, maxres'
+    required: false
+    default: 'default'
+  output-path:
+    description: 'Path to write output files to, defaults to _data'
+    required: false
+    default: '_data/videos'
+  output-filename-template:
+    description: 'Output filename template for each output file including placeholders, defaults to ${position}.yml'
+    required: false
+    default: '${position}.yml'
+  output-content-template:
+    description: 'Output content template for each output file including placeholders'
+    required: false
+    default: |
+      _id: '${id}'
+      etag: '${etag}'
+      title: '${title}'
+      description: '${description}'
+      thumbnailUrl: '${thumbnailUrl}'
+      channelId: '${channelId}'
+      channelTitle: '${channelTitle}'
+      playlistId: '${playlistId}'
+      position: '${position}'
+      videoOwnerChannelTitle: '${videoOwnerChannelTitle}'
+      videoOwnerChannelId: '${videoOwnerChannelId}'
+      videoId: '${videoId}'
+      publishedAt: '${publishedAt}'
+runs:
+  using: 'node16'
+  main: 'index.js'
