@@ -76,7 +76,8 @@ function template(str, item, thumbnailSize) {
 
 function clean(str) {
   return str
-    .replace('\n', '\\n')
-    .replace('\'', '\\\'')
+    .replaceAll('\n', '\\n')
+    .replaceAll('\'', '\'\'')
+    .replaceAll('"', '\\"')
     .replace(/^\d{1,4}([ _./-]\d{1,4})+[ _./-]+/, '');
 }
