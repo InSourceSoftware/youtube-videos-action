@@ -41,7 +41,7 @@ thumbnailUrl: '${thumbnailUrl}'
 channelId: '${channelId}'
 channelTitle: '${channelTitle}'
 playlistId: '${playlistId}'
-position: '${position}'
+position: ${position}
 videoOwnerChannelTitle: '${videoOwnerChannelTitle}'
 videoOwnerChannelId: '${videoOwnerChannelId}'
 videoId: '${videoId}'
