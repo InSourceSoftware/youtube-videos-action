@@ -42457,9 +42457,9 @@ const fs = __nccwpck_require__(7147);
 
 const YOUTUBE_URL = 'https://youtube.googleapis.com';
 
-main()
+main().then(() => console.log('finished'));
 
-function main() {
+async function main() {
   const apiKey = core.getInput('api-key');
   console.log('apiKey=***')
   const playlistId = core.getInput('playlist-id');
@@ -42478,33 +42478,50 @@ function main() {
 
   console.log('Fetching videos...');
   try {
-    fetchVideos(apiKey, playlistId, thumbnailSize, outputPath, outputFilenameTemplate, outputContentTemplate);
+    await fetchVideos(apiKey, playlistId, thumbnailSize, outputPath, outputFilenameTemplate, outputContentTemplate);
   } catch (error) {
     console.error(error);
     core.setFailed(error.message);
   }
 }
 
-function fetchVideos(apiKey, playlistId, thumbnailSize, outputPath, outputFilenameTemplate, outputContentTemplate) {
-  const url = `${YOUTUBE_URL}/youtube/v3/playlistItems?key=${apiKey}&part=snippet%2CcontentDetails&playlistId=${playlistId}&maxResults=500`;
-  const options = {
-    'method': 'GET',
-    'url': url,
-    'headers': {}
-  };
-  request(options, (error, response) => {
-    if (error) {
-      throw new Error(error);
+async function fetchVideos(apiKey, playlistId, thumbnailSize, outputPath, outputFilenameTemplate, outputContentTemplate) {
+  const items = [];
+
+  let data = await fetchPage(apiKey, playlistId, null);
+  items.push(data.items);
+  while (data.nextPageToken !== null) {
+    data = await fetchPage(apiKey, playlistId, data.nextPageToken);
+    items.push(data.items);
+  }
+
+  items
+    .filter(item => Object.keys(item.snippet.thumbnails).length !== 0)
+    .forEach(item => {
+      const content = template(outputContentTemplate, item, thumbnailSize);
+      const filename = template(outputFilenameTemplate, item, thumbnailSize);
+      fs.mkdirSync(outputPath, { recursive: true });
+      fs.writeFileSync(`${outputPath}/${filename}`, content, { encoding: 'utf-8' });
+    });
+}
+
+function fetchPage(apiKey, playlistId, pageToken) {
+  return new Promise((resolve, reject) => {
+    let url = `${YOUTUBE_URL}/youtube/v3/playlistItems?key=${apiKey}&part=snippet%2CcontentDetails&playlistId=${playlistId}&maxResults=50`;
+    if (pageToken !== null) {
+      url = `${url}&pageToken=${pageToken}`;
     }
-    const data = JSON.parse(response.body);
-    data.items
-      .filter(item => Object.keys(item.snippet.thumbnails).length !== 0)
-      .forEach(item => {
-        const content = template(outputContentTemplate, item, thumbnailSize);
-        const filename = template(outputFilenameTemplate, item, thumbnailSize);
-        fs.mkdirSync(outputPath, { recursive: true });
-        fs.writeFileSync(`${outputPath}/${filename}`, content, { encoding: 'utf-8' });
-      });
+    const options = {
+      'method': 'GET',
+      'url': url,
+      'headers': {}
+    };
+    request(options, (error, response) => {
+      if (error) {
+        reject(error);
+      }
+      resolve(JSON.parse(response.body));
+    });
   });
 }
 
@@ -42530,8 +42547,7 @@ function clean(str) {
   return str
     .replaceAll('\n', '\\n')
     .replaceAll('\'', '\'\'')
-    .replaceAll('"', '\\"')
-    .replace(/^\d{1,4}([ _./-]\d{1,4})+[ _./-]+/, '');
+    .replaceAll('"', '\\"');
 }
 })();
 
