@@ -42459,6 +42459,20 @@ const YOUTUBE_URL = 'https://youtube.googleapis.com';
 
 main().then(() => console.log('finished'));
 
+// fetchVideos(process.env.API_KEY, process.env.PLAYLIST_ID, 'standard', '_data/test', '${position}.yml', '_id: \'${id}\'\n'
+//   + 'etag: \'${etag}\'\n'
+//   + 'title: \'${title}\'\n'
+//   + 'description: \'${description}\'\n'
+//   + 'thumbnailUrl: \'${thumbnailUrl}\'\n'
+//   + 'channelId: \'${channelId}\'\n'
+//   + 'channelTitle: \'${channelTitle}\'\n'
+//   + 'playlistId: \'${playlistId}\'\n'
+//   + 'position: ${position}\n'
+//   + 'videoOwnerChannelTitle: \'${videoOwnerChannelTitle}\'\n'
+//   + 'videoOwnerChannelId: \'${videoOwnerChannelId}\'\n'
+//   + 'videoId: \'${videoId}\'\n'
+//   + 'publishedAt: \'${publishedAt}\'').then(() => console.log('finished'))
+
 async function main() {
   const apiKey = core.getInput('api-key');
   console.log('apiKey=***')
@@ -42486,13 +42500,11 @@ async function main() {
 }
 
 async function fetchVideos(apiKey, playlistId, thumbnailSize, outputPath, outputFilenameTemplate, outputContentTemplate) {
-  const items = [];
-
   let data = await fetchPage(apiKey, playlistId, null);
-  items.push(data.items);
-  while (data.nextPageToken !== null) {
+  const items = data.items;
+  while (data.nextPageToken !== undefined) {
     data = await fetchPage(apiKey, playlistId, data.nextPageToken);
-    items.push(data.items);
+    items.push(...data.items);
   }
 
   items
