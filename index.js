@@ -34,13 +34,11 @@ async function main() {
 }
 
 async function fetchVideos(apiKey, playlistId, thumbnailSize, outputPath, outputFilenameTemplate, outputContentTemplate) {
-  const items = [];
-
   let data = await fetchPage(apiKey, playlistId, null);
-  items.push(data.items);
-  while (data.nextPageToken !== null) {
+  const items = data.items;
+  while (data.nextPageToken !== undefined) {
     data = await fetchPage(apiKey, playlistId, data.nextPageToken);
-    items.push(data.items);
+    items.push(...data.items);
   }
 
   items
