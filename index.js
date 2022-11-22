@@ -95,6 +95,5 @@ function clean(str) {
   return str
     .replaceAll('\n', '\\n')
     .replaceAll('\'', '\'\'')
-    .replaceAll('"', '\\"')
-    .replace(/^\d{1,4}([ _./-]\d{1,4})+[ _./-]+/, '');
+    .replaceAll('"', '\\"');
 }
